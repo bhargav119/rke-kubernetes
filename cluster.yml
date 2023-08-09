@@ -1,0 +1,63 @@
+ssh_key_path: C:\SUREDELETELATER\K8SB19\RKE\RKE-CLUSTER\LaptopKey.pem
+cluster_name: k8sb19-rke-cluster
+#ignore_docker_version: true - Dont works. Use "rke up --ignore-docker-version"
+kubernetes_version: v1.24.9-rancher1-1
+nodes:
+  - address: 44.212.75.32
+    hostname_override: master01
+    #internal_address: 172.16.22.12
+    user: ubuntu
+    role: [controlplane, worker, etcd]
+  - address: 18.209.24.136
+    hostname_override: master02
+    #internal_address: 172.16.32.37
+    user: ubuntu
+    role: [controlplane, worker, etcd]
+  - address: 54.145.192.113
+    hostname_override: master03
+    #internal_address: 172.16.42.73
+    user: ubuntu
+    role: [controlplane, worker, etcd]
+  - address: 44.204.54.85
+    hostname_override: worker01
+    #internal_address: 172.16.42.73
+    user: ubuntu
+    role: [worker]
+  - address: 54.80.219.211
+    hostname_override: worker02
+    #internal_address: 172.16.42.73
+    user: ubuntu
+    role: [worker]
+  - address: 54.91.183.115
+    hostname_override: worker03
+    #internal_address: 172.16.42.73
+    user: ubuntu
+    role: [worker]
+
+authentication:
+    strategy: x509
+    sans:
+      - "rke-nlb-452f23bdc1db0c08.elb.us-east-1.amazonaws.com"
+      - "rke.k8sclass.xyz"
+      - "k8s.k8sclass.xyz"
+      - "megastar.k8sclass.xyz"
+services:
+  etcd:
+    snapshot: true
+    creation: 6h
+    retention: 24h
+
+# Required for external TLS termination with
+# ingress-nginx v0.22+
+ingress:
+  provider: nginx
+  options:
+    use-forwarded-headers: "true"
+
+network:
+  plugin: flannel
+  options:
+    flannel_iface: eth0
+    flannel_backend_type: vxlan
+    flannel_autoscaler_priority_class_name: system-cluster-critical # Available as of RKE v1.2.6+
+    flannel_priority_class_name: system-cluster-critical # Available as of RKE v1.2.6+
